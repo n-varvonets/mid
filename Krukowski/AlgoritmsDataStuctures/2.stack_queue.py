@@ -1,6 +1,7 @@
 def find_unmatched_brackets(expression):
     stack = []
     brackets = {')': '(', '}': '{', ']': '['}
+    unmatched_closing = []
 
     for i, char in enumerate(expression):
         if char in brackets.values():
@@ -9,22 +10,25 @@ def find_unmatched_brackets(expression):
             if stack and stack[-1][0] == brackets[char]:
                 stack.pop()
             else:
-                # Если стек пуст или скобка не соответствует, игнорируем её и продолжаем проверку
-                continue
+                unmatched_closing.append((char, i))
 
-    # Если в стеке остались незакрытые скобки, возвращаем их
+    results = []
     if stack:
-        unmatched = ', '.join([f"'{char}' at position {pos}" for char, pos in stack])
-        return f"Unmatched opening brackets: {unmatched}"
+        unmatched_opening = ', '.join([f"'{char}' at position {pos}" for char, pos in stack])
+        results.append(f"Unmatched opening brackets: {unmatched_opening}")
+    if unmatched_closing:
+        unmatched_closing_brackets = ', '.join([f"'{char}' at position {pos}" for char, pos in unmatched_closing])
+        results.append(f"Unmatched closing brackets: {unmatched_closing_brackets}")
+
+    if results:
+        return " | ".join(results)
 
     return "All brackets are matched correctly"
 
 
-# Пример использования
-expression = "Demo (internal {demo2 [invalid])"
+expression = "Demo internal {demo2 [invalid])"
 result = find_unmatched_brackets(expression)
 print(result)
-
 
 ################################################################################################
 from collections import deque
@@ -32,6 +36,9 @@ from collections import deque
 
 class PrinterQueue:
     def __init__(self):
+        # Используем deque для оптимальной работы с очередью.
+        # теоретически можно использовать обычный список для реализации очереди, это будет менее эффективно.
+        # Метод popleft используется для удаления элементов с начала очереди. выполняет эту операцию за постоянное время 𝑂(1)
         self.queue = deque()
 
     def add_job(self, job):
@@ -42,6 +49,7 @@ class PrinterQueue:
     def print_job(self):
         """Распечатать следующий документ в очереди"""
         if self.queue:
+
             job = self.queue.popleft()
             print(f"Печать задачи: {job}")
         else:
