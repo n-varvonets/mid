@@ -31,15 +31,18 @@ def binary_search(arr, target):
 #########################################################################################
 
 class TreeNode:
-    def __init__(self, data):
-        self.data = data
+    def __init__(self, value):
+        self.value = value
         self.left = None
         self.right = None
 
 
 class BalancedBinarySearchTree:
     def __init__(self):
+        # изначально у дерева будет только корень
         self.root = None
+
+
 
     def sorted_array_to_bst(self, arr):
         if not arr:
