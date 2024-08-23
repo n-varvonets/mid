@@ -26,5 +26,9 @@
 - связи/линцки,линии --> **ребра** (от англ - <u>edge</u>)
 - **смежные вершины** (от англ - <u>adjacent vertices</u>) --> вершины к которым мы можем перейти ЗА ОДИН ШАГ  
 
-### dfs
+### dfs - Depth-first search - в глубину
 ![img_1.png](imgs/img9.png)
+
+### Breadth-First Search  - в ширину
+![img_1.png](imgs/img9.png)
+
