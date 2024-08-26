@@ -100,3 +100,27 @@ target = 9
 
 s = Solution()
 print(s.twoSum(nums, target))
+
+class A:
+    def method(self):
+        print("Method in A")
+
+class B(A):
+    def method(self):
+        print("Method in B")
+        super().method()
+
+class C(A):
+    def method(self):
+        print("Method in C")
+        super().method()
+
+class D(B, C):
+    def method(self):
+        print("Method in D")
+        super().method()
+
+d = D()
+d.method()
+
+print(D.__mro__)
