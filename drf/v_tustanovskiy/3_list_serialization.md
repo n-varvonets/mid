@@ -14,6 +14,15 @@
 С `many=True` всё довольно просто. Скажем, у тебя есть модель `Article`, и ты хочешь получить список всех статей в формате JSON. `many=True` говорит DRF: "Эй, у меня тут не один объект, а много, обработай их все, пожалуйста".
 
 ```python
+from django.db import models
+
+class Article(models.Model):
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+
+    def __str__(self):
+        return self.title
+
 # Сериализатор для модели Article
 class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
@@ -51,15 +60,39 @@ class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = ('title', 'content')
+        # list_serializer_class это как доп логика для many=True
         list_serializer_class = CustomListSerializer
 
 # Сериализация всех статей
 articles = Article.objects.all()
+#  без many=True сериализатор будет ожидать одиночный объект и не сможет корректно обработать список.
+#  Таким образом, many=True является ключевым для указания на множественность объектов, а list_serializer_class
+#  предоставляет возможность кастомизации этой обработки.
 serializer = ArticleSerializer(articles, many=True)
 ```
 
 В этом примере `CustomListSerializer` добавляет мета-информацию о количестве объектов в `count`.
-
-Таким образом:
+# <u>**`Таким образом:`**</u>
 - `many=True` используется, когда у тебя есть список объектов, и ты хочешь просто сериализовать их "как есть".
 - `ListSerializer` нужен, если тебе необходимо добавить какую-то дополнительную логику или изменить стандартное поведение при сериализации списка объектов.
+
+
+---
+
+---
+
+## Дополнительные классы сериализаторов в Django REST Framework
+
+Django REST Framework предоставляет различные классы сериализаторов, каждый из которых предназначен для определенных задач:
+
+### ModelSerializer
+- **Описание**: Автоматизирует создание сериализаторов для моделей Django. Он автоматически генерирует поля и методы `create` и `update` на основе модели.
+
+### HyperlinkedModelSerializer
+- **Описание**: Похож на `ModelSerializer`, но использует гиперссылки для связей между сущностями вместо первичных ключей.
+
+### ListSerializer
+- **Описание**: Управляет сериализацией и десериализацией списков объектов. Может быть использован для добавления кастомной логики при обработке списков.
+
+### BaseSerializer
+- **Описание**: Базовый класс для всех сериализаторов, который можно наследовать для создания полностью кастомизированных сериализаторов.
