@@ -99,3 +99,58 @@ def create(self, validated_data):
 ### Что произойдет после запроса:
 - Django Rest Framework проверит, существуют ли указанные ID режиссеров и актеров.  
 - Если валидация пройдет успешно, фильм будет создан, и связи с режиссером и актерами будут установлены.
+
+------
+
+----
+
+# Вопрос
+- разве не проще в валидейт дата добавь эти атрибуты через поиск в кверисет, и таким образом что в create and update попдает уже  `validated_data` уже с нашими аттрибутами?
+
+### Использование `validate` для добавления атрибутов в `validated_data`
+
+Можно оптимизировать процесс добавления связанных объектов (например, режиссеров и актеров) в `validated_data` на этапе валидации, чтобы методы `create` и `update` получали уже готовые объекты. Это позволяет избежать дублирования кода и сделать его чище.
+
+
+```python
+class MovieDetailSerializer(serializers.ModelSerializer):
+    new_directors = serializers.ListField(
+        child=serializers.IntegerField(), write_only=True
+    )
+    new_actors = serializers.ListField(
+        child=serializers.IntegerField(), write_only=True
+    )
+
+    class Meta:
+        model = Movie
+        fields = ('title', 'tagline', 'category', 'directors', 'actors', 'genres', 'reviews', 'new_directors', 'new_actors')
+
+    def validate(self, data):
+        # Преобразуем ID режиссеров и актеров в объекты Person
+        if 'new_directors' in data:
+            data['new_directors'] = Person.objects.filter(id__in=data['new_directors'])
+        if 'new_actors' in data:
+            data['new_actors'] = Person.objects.filter(id__in=data['new_actors'])
+        return data
+
+    def create(self, validated_data):
+        new_directors = validated_data.pop('new_directors', [])
+        new_actors = validated_data.pop('new_actors', [])
+        movie = Movie.objects.create(**validated_data)
+        movie.directors.set(new_directors)
+        movie.actors.set(new_actors)
+        return movie
+
+    def update(self, instance, validated_data):
+        new_directors = validated_data.pop('new_directors', None)
+        new_actors = validated_data.pop('new_actors', None)
+        for key, value in validated_data.items():
+            setattr(instance, key, value)
+        if new_directors is not None:
+            instance.directors.set(new_directors)
+        if new_actors is not None:
+            instance.actors.set(new_actors)
+        instance.save()
+        return instance
+```
+
