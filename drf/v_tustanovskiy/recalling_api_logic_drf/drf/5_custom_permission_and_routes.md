@@ -180,12 +180,19 @@ urlpatterns = [
 # 2. PUT /actor-set/{id}/ - метод `update` не будет вызван, так как он не указан в ручной настройке маршрутов.
 # 3. DELETE /actor-set/{id}/ - метод `destroy` не будет вызван, так как он не указан в ручной настройке маршрутов.
 
+# Альтернативный способ 2 ручной настройки маршрутов
+actor_list = api.ActorModelViewSet.as_view({
+    'get': 'list',    # Обрабатывает GET-запрос для получения списка объектов (метод list)
+    'post': 'create'  # Обрабатывает POST-запрос для создания нового объекта (метод create)
+})
+
 
 
 from rest_framework import viewsets
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 
+# Вариант 1: Использование ViewSet - ручная реализация методов
 class ActorViewSet(viewsets.ViewSet):
     
     # Метод для получения списка всех актеров
@@ -200,4 +207,131 @@ class ActorViewSet(viewsets.ViewSet):
         actor = get_object_or_404(queryset, pk=pk)  # Получаем конкретного актера или возвращаем 404, если не найден
         serializer = ActorDetailSerializer(actor)  # Сериализуем данные об актёре
         return Response(serializer.data)  # Возвращаем сериализованные данные
+
+# Вариант 2: Использование GenericViewSet с миксинами - автоматическая реализация методов  
+# - GenericViewSet добавляет лоигку с queryset и serializer_class
+# - Чтобы он стал функциональным, вы добавляете миксины, например ListModelMixin и RetrieveModelMixin для `list` и `retrieve`
+class ActorGenericViewSet(mixins.ListModelMixin, 
+                          mixins.RetrieveModelMixin, 
+                          viewsets.GenericViewSet):
+    queryset = Actor.objects.all()
+    serializer_class = ActorSerializer
+    # Этот код автоматически добавляет методы `list` и `retrieve`, не требуя их явной реализации.
+
+
+# Вариант 3: Использование ModelcViewSet с миксинами - автоматическая реализация методов  
+class ActorViewSet(viewsets.ModelViewSet):
+    queryset = Actor.objects.all()
+    serializer_class = ActorSerializer
+    
+    
+    #3.a указать пермишены именно на 2 эти действия
+    permission_classes_by_action = {
+        'update': [IsAuthorCommentEntry],  # Разрешение только для автора комментария на обновление
+        'destroy': [IsAuthorCommentEntry]  # Разрешение только для автора комментария на удаление
+    }
+    #3.b указать пермишены - для всенх остальны акшинов будет работать эти
+    permission_classes = [IsAuth] 
+    @action(detail=True, methods=['get', 'put'], renderer_classes=[renderers.AdminRenderer])
+    def example(self, request, *args, **kwargs):
+        """
+        Аргумент detail=True указывает, что это действие связано c 1 конкретным объектом, а не со списком объектов.
+        Этот код можно вызвать, например, по следующему URL:
+
+         - GET /actors/1/example/: Вернет сериализованные данные актера с ID 1.
+         - PUT /actors/1/example/: Обновит данные актера с ID 1, если переданы обновленные данные (нужно добавить логику для обновления).
+        
+        Чтобы добавить поддержку DELETE для вашего кастомного действия, вам нужно явно указать этот метод в параметре methods:
+         - methods=['get', 'put', 'delete']
+        """
+        # Получаем объект актера
+        actor = self.get_object()
+
+        # Сериализуем объект актера с помощью ActorDetailSerializer
+        serializer = ActorDetailSerializer(actor)
+
+        # Возвращаем сериализованные данные в ответе
+        return Response(serializer.data)
+    
+    @action(detail=False, permission_classes=[permissions.IsAuthenticated])
+    def my_list(self, request, *args, **kwargs):
+        """
+        detail=False - т.к. ЛИСТ
+        #1 указать пермишены
+        """
+        # Вызовем метод list из родительского класса, чтобы получить список объектов
+        return super().list(request, *args, **kwargs)
+
+    def get_permissions(self):
+        #2 указать пермишены
+        # Проверяем, какое действие выполняется, и устанавливаем соответствующие разрешения
+        if self.action == 'list':
+            permission_classes = [permissions.IsAuthenticated]  # Доступ только для аутентифицированных пользователей
+        elif self.action == 'example':
+            permission_classes = [permissions.IsAuthenticated]  # Доступ только для аутентифицированных пользователей
+        else:
+            permission_classes = [permissions.IsAdminUser]  # Для всех остальных действий доступ только для администраторов
+        return [permission() for permission in permission_classes]  # Применяем установленные классы разрешений
+```
+
+```python
+from rest_framework import serializers
+from .models import Actor
+
+class ActorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Actor
+        fields = '__all__'
+        # Если нужно сделать поле доступным только для чтения или записи, можно использовать следующие параметры:
+        read_only_fields = ['id']  # Поля, доступные только для чтения
+        # extra_kwargs = {
+        #     'name': {'write_only': True},  # Поля, доступные только для записи
+        # }
+# Пример POST запроса на создание актера
+{
+    "name": "Robert Downey Jr.",
+    "age": 56
+    # "id" не нужно передавать, так как это поле является read_only и генерируется автоматически
+}
+
+# Пример GET запроса для получения информации об актере
+{
+    "id": 1,
+    "name": "Robert Downey Jr.",
+    "age": 56
+    # Поле "id" будет присутствовать в ответе, так как оно указано как read_only
+}
+```
+---
+
+## CUSTOM PERMISSION FOR ACTION
+```python
+class MixedPermission:
+    """Миксин permissions для action"""
+    
+    def get_permissions(self):
+        try:
+            # Возвращает permissions, специфичные для action, если они определены
+            return [permission() for permission in self.permission_classes_by_action[self.action]]
+        except KeyError:
+            # Если для данного action нет специфичных permissions, возвращает общие permissions
+            return [permission() for permission in self.permission_classes]
+
+# Класс ViewSet, использующий смешанные permissions
+class MixedPermissionViewSetDS(MixedPermission, viewsets.ViewSet):
+    pass
+
+# Класс GenericViewSet, использующий смешанные permissions
+class MixedPermissionGenericViewSetDS(MixedPermission, viewsets.GenericViewSet):
+    pass
+
+# Класс, предоставляющий действия создания, обновления и удаления с использованием смешанных permissions
+class CreateUpdateDestroyDS(
+    mixins.CreateModelMixin, 
+    mixins.UpdateModelMixin, 
+    mixins.DestroyModelMixin, 
+    MixedPermission, 
+    viewsets.GenericViewSet
+):
+    pass
 ```
