@@ -12,6 +12,9 @@ extra_kwargs = {
 
 ## Пример 2: Определение полей напрямую
 
+`PrimaryKeyRelatedField` — это сериализаторное поле в Django REST Framework, которое используется для работы с объектами, связанными по первичному ключу. Это поле позволяет представлять и обрабатывать связанные объекты через их первичные ключи, вместо того чтобы сериализовать весь объект целиком.
+
+
 ```python
 # Дополнительные поля, которые будут использоваться только для десериализации (POST/PUT)
 new_directors = serializers.PrimaryKeyRelatedField(queryset=Person.objects.all(), many=True, write_only=True)
@@ -154,3 +157,45 @@ class MovieDetailSerializer(serializers.ModelSerializer):
         return instance
 ```
 
+## Пример использования `PrimaryKeyRelatedField`
+
+Представим, что у вас есть модель `Movie`, которая связана с моделью `Person` (например, режиссеры и актеры фильма). В запросах на создание или обновление фильма вам нужно передавать только ID этих связанных объектов, а не всю информацию о них.
+
+### Модель `Movie`
+
+```python
+# пример с  PrimaryKeyRelatedField и убиранием лишнего кода
+class Movie(models.Model):
+    title = models.CharField(max_length=100)
+    directors = models.ManyToManyField(Person, related_name='directed_movies')
+    actors = models.ManyToManyField(Person, related_name='acted_movies')
+
+#Сериализатор с использованием PrimaryKeyRelatedField
+class MovieSerializer(serializers.ModelSerializer):
+    new_directors = serializers.PrimaryKeyRelatedField(queryset=Person.objects.all(), many=True, write_only=True)
+    new_actors = serializers.PrimaryKeyRelatedField(queryset=Person.objects.all(), many=True, write_only=True)
+
+    class Meta:
+        model = Movie
+        fields = ['title', 'new_directors', 'new_actors']
+
+    def validate(self, data):
+        # Преобразуем ID режиссеров и актеров в объекты Person
+        if 'new_directors' in data:
+            data['new_directors'] = Person.objects.filter(id__in=data['new_directors'])
+        if 'new_actors' in data:
+            data['new_actors'] = Person.objects.filter(id__in(data['new_actors']))
+        return data
+```
+
+#### Пример запроса на создание фильма
+```json
+{
+    "title": "Inception",
+    "new_directors": [1, 2],  # ID режиссеров
+    "new_actors": [3, 4, 5]  # ID актеров
+}
+```
+#### Что решает PrimaryKeyRelatedField:
+- `Минимизация данных:` Вместо того чтобы передавать полную информацию о режиссерах и актерах, вы просто передаете их ID. Это уменьшает объем данных в запросе.
+- `Простота работы:` Django автоматически преобразует переданные ID в объекты Person и связывает их с моделью Movie.
