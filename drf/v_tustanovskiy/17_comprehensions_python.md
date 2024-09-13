@@ -75,4 +75,20 @@ print(gen)  # <generator object my_generator at 0x0000021586DA4880>
 print(next(gen))  # 1
 print(next(gen))  # 2
 print(next(gen))  # 3
+
+
+numbers_1 = [i ** 2 for i in range(1, 10**6, 2)]  # хранится в памяти вемь обьект
+print(numbers_1)  # [1, 9, 25, 49, 81, 121, 169, 225, 289, 361, 441, 529, 625, 729, 841, ...]
+# print(next(numbers_1))  #
+
+numbers_1 = iter(numbers_1)
+print(numbers_1)  # <list_iterator object at 0x00000215B5D93760>
+print(next(numbers_1))  # 1
+
+numbers_gen = (i ** 2 for i in range(1, 10**6, 2))  # НЕ хранится в памяти весь обьект. а достает один елемент через нет КОГДА К НЕМУ ОБРАЩАЮТСЯ через next()
 ```
+  
+
+
+
+
