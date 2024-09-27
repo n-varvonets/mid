@@ -42,8 +42,6 @@ class BalancedBinarySearchTree:
         # изначально у дерева будет только корень
         self.root = None
 
-
-
     def sorted_array_to_bst(self, arr):
         if not arr:
             return None
