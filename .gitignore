@@ -1,0 +1,53 @@
+# Terraform State Files
+*.tfstate
+*.tfstate.*
+
+# Crash Log Files
+crash.log
+
+# Terraform Variable Files
+*.tfvars
+*.tfvars.json
+
+# Override files (used to override variables for different environments)
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Terraform Plan Output Files
+*.tfplan
+
+# .terraform directory, which contains downloaded provider plugins and modules
+.terraform/
+.terraform.lock.hcl
+
+# Sensitive Environment Files
+.env
+.envs
+.env.*
+.venv
+
+# User-specific configuration files and directories
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs and system files
+*.log
+*.bak
+*.tmp
+
+# Ignore files containing secrets (AWS Keys, etc.)
+*secrets*
+*credentials*
+
+# MacOS-specific system files
+.DS_Store
+
+# Windows-specific system files
+Thumbs.db
+
+# Backup and temp files created by editors
+*~
