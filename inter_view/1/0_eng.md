@@ -1,8 +1,9 @@
 ## 1. Расскажите о себе.
 
-I am 28 years old and live in Odessa. I have been in IT for almost 4 years. Python is my main language, and I've worked
-with AWS and NoSQL databases like Elasticsearch. I have experience with big data, optimizing them, and using AWS for
-asynchronous processing.
+- I am 28 years old and live in Odessa. I have been in IT for almost 4 years.
+- Python is my main language, and I've worked with AWS and NoSQL databases like Elasticsearch.
+- I have experience with big data, optimizing them, and using AWS for asynchronous processing.
+- As a developer, I am capable of diving deep into any technology and effectively using documentation to master it.
 
 ## 2. Опыт работы.
 

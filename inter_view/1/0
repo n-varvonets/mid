@@ -1,0 +1,48 @@
+0.  AWS
+I have used Amazon Web Services primarily for business purposes
+- setting up Virtual Private Clouds with autosacling and load balancing for scalable and relibile infrastucture
+
+- API Gateway and Lambda (is a serverless compute service that runs code in response to events)
+-- For example, I have used API Gateway to create secure, scalable APIs as part of serverless architectures.
+API Gateway routes requests to Lambda, allowing me to handle event-driven tasks without managing servers.
+-- the SNS service acted as a trigger for Lambda functions(there some task thar were pushed into sns service)
+
+- Terraform and CloudFormation
+I haven’t used Terraform in production, but I have received hands-on experience with AWS CloudFormation,
+which is a similar IaC tool. The main difference is that CloudFormation uses a different syntax,
+but the goal is the same: automated management AWS resources.
+## I have worked with Terraform for self-education purposes to understand Infrastructure-as-Code (IaC) principles.
+
+- monitoring
+- Yes, of course, when I developed my app, errers were collected in cloudwatch for resolving them in future,
+allowing us to troubleshoot and optimize application performance.
+- in another case when I build pipelines and collected some statics into CloudWatch service for vizualization it in Grafana
+
+- RDS (RDS automates backups, scaling, and security.)
+In my previous project, the DevOps team handled RDS by setting it up on EC2 instances and providing access credentials for our team
+
+- S3:
+I have used S3 for object storage, managing file uploads, backups, and archiving data.
+S3 is scalable service which ideal for handling large amounts of data in a cost-effective way.
+
+1. Understanding of EHR technologies such as EPIC, Cerner, etc…
+I dont have direct expirince in EHR such as EPIC and Cerner, but I'm eager to learn more about it
+
+I haven’t used DICOM  and HL7/FHIR in practice.
+DICOM – used for handling static data like medical images.
+HL7/FHIR – dynamic standards for exchanging medical data
+
+2. CI/CD
+I used to work with GitActions to intigrate my code at various stages of development. This included running tests, linting, and deploying code to different environments
+In my previous project DevOps team handled CD by utilizing autoscaling and loadbalancing services within amazon VPC(ви-пи-си)
+
+3.Python/Powershell
+-- I'm highly proficient in python and can automate almost all bisness logic what u need.
+----- automate data processing tasks,
+----- integrate with APIs,
+----- and handle cloud services
+-- Powershell is envirment  where u can run commands to automate  bussnes  logic
+
+
+
+
