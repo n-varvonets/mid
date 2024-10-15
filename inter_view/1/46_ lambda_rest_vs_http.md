@@ -42,7 +42,7 @@ WAF или Private API endpoints. Выбирайте **HTTP API**, если ва
 | Public HTTP endpoints                                |    ✔️    |    ✔️    | Открытые конечные точки HTTP для общедоступного API.                          |
 | AWS services                                         |    ✔️    |    ✔️    | Интеграция с различными AWS сервисами.                                        |
 | AWS Lambda functions                                 |    ✔️    |    ✔️    | Поддержка интеграции с AWS Lambda для выполнения кода.                        |
-| Private integrations with Network Load Balancers     |    ✔️    |    ✔️    | Приватные интеграции с сетевыми балансировщиками нагрузки.                    |
+| Private integrations with  Network Load Balancers    |    ✔️    |    ✔️    | Приватные интеграции с сетевыми балансировщиками нагрузки.                    |
 | Private integrations with Application Load Balancers |          |    ✔️    | Приватные интеграции с балансировщиками нагрузки приложений.                  |
 | Private integrations with AWS Cloud Map              |          |    ✔️    | Приватные интеграции с AWS Cloud Map для управления ресурсами.                |
 | Mock integrations                                    |    ✔️    |          | Моделирование интеграций для тестирования API без реальных серверных вызовов. |
